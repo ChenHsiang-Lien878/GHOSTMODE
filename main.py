@@ -1,7 +1,11 @@
 from flask import Flask, request, jsonify
 from reply import generate_reply, send_reply, IG_USER_ID
 from history import add_message, format_history_for_prompt
+from datetime import datetime, timedelta
+from pending_replies import add_pending_reply, get_due_replies
 from settings import load_settings
+import threading
+import time
 app = Flask(__name__)
 
 VERIFY_TOKEN = "ghostmode123"
@@ -51,11 +55,32 @@ def webhook():
                 history_text = format_history_for_prompt(sender_id)
                 print(reply_mode, flush=True)
                 reply = generate_reply(message_text, history_text, reply_mode)
-                send_reply(sender_id, reply)
+
+                delay_seconds = settings["reply_delay_seconds"]
+                send_at = (datetime.utcnow() + timedelta(seconds=delay_seconds)).isoformat()
+
+                add_pending_reply(sender_id, reply, send_at)
                 add_message(sender_id, "assistant", reply)
+                print(f"Queued reply for {sender_id} in {delay_seconds}s", flush=True)
 
     return jsonify({"status": "received"}), 200
 
+def pending_reply_worker():
+    while True:
+        try:
+            due_replies = get_due_replies()
+
+            for item in due_replies:
+                ok, result = send_reply(item["user_id"], item["text"])
+                print(f"Delayed send to {item['user_id']}: {result}", flush=True)
+
+        except Exception as e:
+            print(f"Pending reply worker error: {e}", flush=True)
+
+        time.sleep(1)
 
 if __name__ == "__main__":
+    worker_thread = threading.Thread(target=pending_reply_worker, daemon=True)
+    worker_thread.start()
+
     app.run(host="0.0.0.0", port=5000, debug=False)

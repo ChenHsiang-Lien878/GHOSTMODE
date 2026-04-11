@@ -36,6 +36,18 @@ if "clear_manual_reply" not in st.session_state:
 if "clear_incoming_message" not in st.session_state:
     st.session_state.clear_incoming_message = False
 
+settings = load_settings()
+
+if "reply_delay_seconds" not in st.session_state:
+    st.session_state.reply_delay_seconds = settings["reply_delay_seconds"]
+
+def on_delay_change():
+    settings = load_settings()
+    settings["reply_delay_seconds"] = st.session_state.reply_delay_seconds
+    save_settings(settings)
+
+
+
 history_data = load_history()
 contact_ids = list(history_data.keys())
 
@@ -177,6 +189,7 @@ with right_col:
             st.markdown(
                 f'<span class="mode-pill">{mode_label}</span>'
                 f'<span class="mode-pill">{display_name}</span>'
+                f'<span class="mode-pill">Delay: {st.session_state.reply_delay_seconds}s</span>'
                 f'<span class="mode-pill">Mode: {st.session_state.reply_mode.title()}</span>',
 
                 unsafe_allow_html=True
@@ -194,13 +207,6 @@ with right_col:
                 save_settings(settings)
 
 
-            st.selectbox(
-                "Reply Mode",
-                ["normal", "no"],
-                key="reply_mode",
-                on_change=on_reply_mode_change
-            )
-
             toggle_col, _ = st.columns([1, 4])
             with toggle_col:
                 if st.button("Toggle GhostMode"):
@@ -211,6 +217,24 @@ with right_col:
                     save_settings(settings)
 
                     st.rerun()
+
+
+            st.selectbox(
+                "Reply Mode",
+                ["normal", "no"],
+                key="reply_mode",
+                on_change=on_reply_mode_change
+            )
+
+
+            st.number_input(
+                "Reply Delay (seconds)",
+                min_value=0,
+                max_value=120,
+                step=1,
+                key="reply_delay_seconds",
+                on_change=on_delay_change
+            )
 
             st.divider()
 

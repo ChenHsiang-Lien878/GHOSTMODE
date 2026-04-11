@@ -5,7 +5,9 @@ SETTINGS_FILE = "settings.json"
 
 DEFAULT_SETTINGS = {
     "ghost_mode": True,
-    "reply_mode": "normal"
+    "reply_mode": "normal",
+    "reply_delay_seconds": 5
+
 }
 
 
@@ -19,7 +21,8 @@ def load_settings():
             data = json.load(f)
             return {
                 "ghost_mode": data.get("ghost_mode", True),
-                "reply_mode": data.get("reply_mode", "normal")
+                "reply_mode": data.get("reply_mode", "normal"),
+                "reply_delay_seconds": data.get("reply_delay_seconds", 5)
             }
     except Exception:
         save_settings(DEFAULT_SETTINGS)

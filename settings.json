@@ -1,4 +1,5 @@
 {
   "ghost_mode": true,
-  "reply_mode": "normal"
+  "reply_mode": "normal",
+  "reply_delay_seconds": 0
 }
