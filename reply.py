@@ -10,7 +10,7 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 
 
 def generate_reply(message: str, conversation_history: str, mode: str = "normal", tone: str = "casual") -> str:
-    reply = generate_instagram_reply(message, conversation_history, mode)
+    reply = generate_instagram_reply(message, conversation_history, mode, tone)
 
     if not reply or str(reply).startswith("Error:"):
         if mode == "no":
