@@ -1,15 +1,24 @@
+import os
 import requests
 from dotenv import load_dotenv
-import os
+from API import generate_instagram_reply
 
 load_dotenv()
+
 IG_USER_ID = "17841434171692913"
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 
-def generate_reply(message):
-    return "Hey! I'm in ghost mode right now 👻"
 
-def send_reply(user_id, text):
+def generate_reply(message: str) -> str:
+    reply = generate_instagram_reply(message)
+
+    if not reply or reply.startswith("Error:"):
+        return "Hey! I'm a bit busy right now, I'll get back to you soon."
+
+    return reply
+
+
+def send_reply(user_id: str, text: str) -> None:
     url = f"https://graph.instagram.com/v25.0/{IG_USER_ID}/messages"
 
     payload = {
