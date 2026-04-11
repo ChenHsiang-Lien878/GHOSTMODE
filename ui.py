@@ -113,6 +113,26 @@ st.markdown("""
         linear-gradient(135deg, #05070d 0%, #09111f 42%, #0c1630 100%);
     color: #f5f7fb;
 }
+/* Keep header visible but style it */
+header {
+    background-color: #05070d !important;
+}
+
+/* Inject custom title */
+header::before {
+    content: "👻 GhostMode";
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+}
+
+/* Optional: remove "Deploy" button */
+[data-testid="stToolbar"] {
+    right: 1rem;
+}
 
 .block-container {
     padding-top: 1.2rem;
