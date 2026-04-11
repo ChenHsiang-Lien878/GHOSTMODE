@@ -48,14 +48,20 @@ def webhook():
             add_message(sender_id, "user", message_text)
 
             settings = load_settings()
+
             reply_mode = settings["reply_mode"]
+            reply_tone = settings["reply_tone"]
             ghost_mode = settings["ghost_mode"]
 
             if ghost_mode:
                 history_text = format_history_for_prompt(sender_id)
                 print(reply_mode, flush=True)
-                reply = generate_reply(message_text, history_text, reply_mode)
-
+                reply = generate_reply(
+                    message_text,
+                    history_text,
+                    reply_mode,
+                    reply_tone
+                )
                 delay_seconds = settings["reply_delay_seconds"]
                 send_at = (datetime.utcnow() + timedelta(seconds=delay_seconds)).isoformat()
 

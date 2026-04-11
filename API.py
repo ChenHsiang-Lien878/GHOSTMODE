@@ -31,11 +31,28 @@ def generate_text(prompt: str, model_name: str = DEFAULT_MODEL) -> str:
         return f"Error: {str(e)}"
 
 
-def generate_instagram_reply(message, conversation_history, mode="normal"):
+def generate_instagram_reply(message, conversation_history, mode="normal", tone="casual"):
     print("mode is" + mode)
+    if tone == "casual":
+        tone_instruction = """
+        Tone: Casual
+        - Sound relaxed and natural
+        - Use informal language
+        - Keep it short and conversational
+        """
+    else:
+        tone_instruction = """
+        Tone: Formal
+        - Be polite and professional
+        - Avoid slang
+        - Use proper grammar
+        - Still keep it short
+        """
     if mode == "no":
         prompt = f"""
 You are writing a short Instagram DM reply.
+
+{tone_instruction}
 
 Mode: No Mode
 
@@ -60,6 +77,8 @@ Write the next assistant reply only.
     else:
         prompt = f"""
 You are writing a short Instagram DM auto-reply.
+
+{tone_instruction}
 
 Rules:
 - Reply in 1 short sentence only

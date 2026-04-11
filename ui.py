@@ -27,6 +27,9 @@ if "reply_mode" not in st.session_state:
 if "manual_reply_text" not in st.session_state:
     st.session_state.manual_reply_text = ""
 
+if "reply_tone" not in st.session_state:
+    st.session_state.reply_tone = settings["reply_tone"]
+
 if "incoming_message_text" not in st.session_state:
     st.session_state.incoming_message_text = ""
 
@@ -46,7 +49,10 @@ def on_delay_change():
     settings["reply_delay_seconds"] = st.session_state.reply_delay_seconds
     save_settings(settings)
 
-
+def on_tone_change():
+    settings = load_settings()
+    settings["reply_tone"] = st.session_state.reply_tone
+    save_settings(settings)
 
 history_data = load_history()
 contact_ids = list(history_data.keys())
@@ -190,6 +196,7 @@ with right_col:
                 f'<span class="mode-pill">{mode_label}</span>'
                 f'<span class="mode-pill">{display_name}</span>'
                 f'<span class="mode-pill">Delay: {st.session_state.reply_delay_seconds}s</span>'
+                f'<span class="mode-pill">Tone: {st.session_state.reply_tone.title()}</span>'
                 f'<span class="mode-pill">Mode: {st.session_state.reply_mode.title()}</span>',
 
                 unsafe_allow_html=True
@@ -224,6 +231,13 @@ with right_col:
                 ["normal", "no"],
                 key="reply_mode",
                 on_change=on_reply_mode_change
+            )
+
+            st.selectbox(
+                "Reply Tone",
+                ["casual", "formal"],
+                key="reply_tone",
+                on_change=on_tone_change
             )
 
 
@@ -295,7 +309,8 @@ with right_col:
                         ai_reply = generate_reply(
                             st.session_state.incoming_message_text,
                             history_text,
-                            st.session_state.reply_mode
+                            st.session_state.reply_mode,
+                            st.session_state.reply_tone
                         )
                         st.success("Preview generated")
                         st.write(ai_reply)
