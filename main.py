@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from reply import generate_reply, send_reply, IG_USER_ID
 from history import add_message, format_history_for_prompt
-
+from settings import load_settings
 app = Flask(__name__)
 
 VERIFY_TOKEN = "ghostmode123"
@@ -43,13 +43,15 @@ def webhook():
             # Save user's new message first
             add_message(sender_id, "user", message_text)
 
-            if GHOST_MODE:
+            settings = load_settings()
+            reply_mode = settings["reply_mode"]
+            ghost_mode = settings["ghost_mode"]
+
+            if ghost_mode:
                 history_text = format_history_for_prompt(sender_id)
-                reply = generate_reply(message_text, history_text)
-
+                print(reply_mode, flush=True)
+                reply = generate_reply(message_text, history_text, reply_mode)
                 send_reply(sender_id, reply)
-
-                # Save assistant reply too
                 add_message(sender_id, "assistant", reply)
 
     return jsonify({"status": "received"}), 200
