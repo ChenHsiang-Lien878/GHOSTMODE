@@ -21,9 +21,6 @@ DEFAULT_MODEL = "models/gemini-2.5-flash"
 
 
 def generate_text(prompt: str, model_name: str = DEFAULT_MODEL) -> str:
-    """
-    Generate text using Google's Gemini API.
-    """
     try:
         response = client.models.generate_content(
             model=model_name,
@@ -34,27 +31,26 @@ def generate_text(prompt: str, model_name: str = DEFAULT_MODEL) -> str:
         return f"Error: {str(e)}"
 
 
-def generate_instagram_reply(message: str) -> str:
-    """
-    Generate a short Instagram DM auto-reply.
-    """
+def generate_instagram_reply(message: str, conversation_history: str) -> str:
     prompt = f"""
 You are writing a short Instagram DM auto-reply.
 
 Rules:
 - Reply in 1 short sentence only
 - Sound casual and human
+- Match the tone of the conversation
 - Do not use hashtags
 - Do not mention being an AI
 - Do not over-explain
-- Keep it under 20 words
+- Keep it under 18 words
+- Do not repeat the same reply every time
 
-Incoming message: "{message}"
+Conversation history:
+{conversation_history}
+
+Latest user message:
+"{message}"
+
+Write the next assistant reply only.
 """
     return generate_text(prompt)
-
-
-if __name__ == "__main__":
-    test_message = "Hey are you free later?"
-    print("Generated Reply:")
-    print(generate_instagram_reply(test_message))

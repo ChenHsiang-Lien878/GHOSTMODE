@@ -9,11 +9,11 @@ IG_USER_ID = "17841434171692913"
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 
 
-def generate_reply(message: str) -> str:
-    reply = generate_instagram_reply(message)
+def generate_reply(message: str, conversation_history: str) -> str:
+    reply = generate_instagram_reply(message, conversation_history)
 
     if not reply or reply.startswith("Error:"):
-        return "Hey! I'm a bit busy right now, I'll get back to you soon."
+        return "Hey, I’m a bit busy right now, I’ll get back to you soon."
 
     return reply
 

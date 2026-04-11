@@ -1,3 +1,7 @@
 key.txt
 .env
 /.venv
+chat_history.json
+__pycache__/
+*.pyc
+.venv/
