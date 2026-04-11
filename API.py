@@ -1,56 +1,53 @@
-import os
-from dotenv import load_dotenv
 import google.genai as genai
+import os
 
-load_dotenv()
-
-API_KEY = os.getenv("GOOGLE_API_KEY")
-
+# Set your API key (replace with your actual key or use environment variable)
+# You can get a key from https://makersuite.google.com/app/apikey
+API_KEY = os.getenv("GOOGLE_API_KEY")  # Recommended: store in environment variable
 if not API_KEY:
-    key_file = os.path.join(os.path.dirname(__file__), "key.txt")
+    # Try to read from a file named 'key.txt' in the same directory as this script
+    key_file = os.path.join(os.path.dirname(__file__), 'key.txt')
     if os.path.exists(key_file):
-        with open(key_file, "r", encoding="utf-8") as f:
+        with open(key_file, 'r') as f:
             API_KEY = f.read().strip()
-
-if not API_KEY:
-    raise ValueError("GOOGLE_API_KEY not found in .env or key.txt")
+    else:
+        API_KEY = "AIzaSyDG02ethXcbz5UDupi68KwuvdY26vQbN6M"  # Replace with your key or create key.txt
 
 client = genai.Client(api_key=API_KEY)
 
-DEFAULT_MODEL = "models/gemini-2.5-flash"
+# Function to generate text using Gemini
+def generate_text(prompt, model_name="models/gemini-2.0-flash"):
+    """
+    Generate text using Google's Gemini API.
 
+    Args:
+        prompt (str): The input prompt for generation.
+        model_name (str): The model to use (e.g., 'models/gemini-2.0-flash', 'models/gemini-2.5-flash').
 
-def generate_text(prompt: str, model_name: str = DEFAULT_MODEL) -> str:
+    Returns:
+        str: The generated text.
+    """
     try:
         response = client.models.generate_content(
             model=model_name,
             contents=prompt
         )
-        return (response.text or "").strip()
+        return response.text
     except Exception as e:
         return f"Error: {str(e)}"
 
-
-def generate_instagram_reply(message: str, conversation_history: str) -> str:
-    prompt = f"""
-You are writing a short Instagram DM auto-reply.
-
-Rules:
-- Reply in 1 short sentence only
-- Sound casual and human
-- Match the tone of the conversation
-- Do not use hashtags
-- Do not mention being an AI
-- Do not over-explain
-- Keep it under 18 words
-- Do not repeat the same reply every time
-
-Conversation history:
-{conversation_history}
-
-Latest user message:
-"{message}"
-
-Write the next assistant reply only.
-"""
-    return generate_text(prompt)
+# Example usage
+if __name__ == "__main__":
+    # List available models
+    try:
+        models = client.models.list()
+        print("Available models:")
+        for model in models:
+            print(f"- {model.name}")
+    except Exception as e:
+        print(f"Error listing models: {e}")
+    
+    prompt = "Explain the benefits of renewable energy in one paragraph."
+    result = generate_text(prompt)
+    print("Generated Text:")
+    print(result)
