@@ -1,6 +1,8 @@
 import streamlit as st
 from history import load_history, add_message, get_recent_history, format_history_for_prompt
 from reply import generate_reply
+from profile import get_display_name, generate_avatar
+
 
 st.set_page_config(
     page_title="GhostMode",
@@ -100,10 +102,19 @@ with left_col:
             st.info("No chat history found yet. Send an Instagram message first.")
         else:
             for user_id in contact_ids:
-                label = f"{user_id} • {message_count(user_id)} msgs"
-                if st.button(label, key=f"contact_{user_id}", use_container_width=True):
-                    st.session_state.selected_user = user_id
-                    st.rerun()
+                display_name, profile_pic = get_display_name(user_id)
+
+                col1, col2 = st.columns([1, 4])
+
+                with col1:
+                    avatar_url = profile_pic if profile_pic else generate_avatar(display_name)
+                    st.image(avatar_url, width=40)
+
+                with col2:
+                    label = f"{display_name} • {message_count(user_id)} msgs"
+                    if st.button(label, key=f"contact_{user_id}", use_container_width=True):
+                        st.session_state.selected_user = user_id
+                        st.rerun()
 
 # ---------------------------
 # Right panel: chat + controls
