@@ -31,19 +31,44 @@ def generate_text(prompt: str, model_name: str = DEFAULT_MODEL) -> str:
         return f"Error: {str(e)}"
 
 
-def generate_instagram_reply(message: str, conversation_history: str) -> str:
-    prompt = f"""
-You are writing a short Instagram DM auto-reply.
+def generate_instagram_reply(message, conversation_history, mode="normal", tone="casual"):
+    print("mode is " + mode, flush=True)
+    print("tone is " + tone, flush=True)
+
+    if tone == "formal":
+        tone_instruction = """
+Tone: Formal
+- Be polite and professional
+- Avoid slang
+- Use proper grammar
+- Keep it short and clear
+"""
+    else:
+        tone_instruction = """
+Tone: Casual
+- Sound relaxed and natural
+- Use informal language
+- Keep it short and conversational
+"""
+
+    if mode == "no":
+        prompt = f"""
+You are writing a short Instagram DM reply.
+
+{tone_instruction}
+
+Mode: No Mode
 
 Rules:
-- Reply in 1 short sentence only
-- Sound casual and human
-- Match the tone of the conversation
-- Do not use hashtags
+- Always reject, decline, or say no but make it kind
+- Never agree to the request
+- Sound human and natural
+- Match the requested tone
+- Keep it short, max 1 sentence
+- Keep it under 15 words
 - Do not mention being an AI
-- Do not over-explain
-- Keep it under 18 words
-- Do not repeat the same reply every time
+- Do not be overly rude
+- Vary the wording so it does not sound repetitive
 
 Conversation history:
 {conversation_history}
@@ -53,4 +78,28 @@ Latest user message:
 
 Write the next assistant reply only.
 """
+    else:
+        prompt = f"""
+You are writing a short Instagram DM auto-reply.
+
+{tone_instruction}
+
+Rules:
+- Reply in 1 short sentence only
+- Sound human and natural
+- Match the requested tone
+- Match the tone of the conversation
+- Do not mention being an AI
+- Keep it under 18 words
+- Do not over-explain
+
+Conversation history:
+{conversation_history}
+
+Latest user message:
+"{message}"
+
+Write the next assistant reply only.
+"""
+
     return generate_text(prompt)
